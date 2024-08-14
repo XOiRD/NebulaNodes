@@ -41,12 +41,19 @@ public class GameManager : MonoBehaviour
     private bool isCheckingMatch = false;
     [SerializeField]private int totalMatches;
     [SerializeField]private int currentMatches = 0;
-
     private List<Sprite> selectedImages = new List<Sprite>();
+
+    [Header("Sound effects")]
+    [Space(5)]
+    AudioSource audioSource;
+    public AudioClip flipcardAudio;
+    public AudioClip matchAudio;
+    public AudioClip mismatchAudio;
+    public AudioClip gameOverAudio;
 
     void Start()
     {
-        
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void StartGame()
@@ -138,10 +145,14 @@ public class GameManager : MonoBehaviour
         if(firstSelectedCard.Count == secondSelectedCard.Count)
         {
             firstSelectedCard.Add(selectedCard);
+            audioSource.clip = flipcardAudio;
+            audioSource.Play();
         }
         else
         {
             secondSelectedCard.Add(selectedCard);
+            audioSource.clip = flipcardAudio;
+            audioSource.Play();
         }
         if (firstSelectedCard.Count == 1 && secondSelectedCard.Count == 1)
         {
@@ -159,10 +170,14 @@ public class GameManager : MonoBehaviour
         {
             firstSelectedCard[0].SetMatched();
             secondSelectedCard[0].SetMatched();
+            audioSource.clip = matchAudio;
+            audioSource.Play();
             currentMatches++;
             if(currentMatches == totalMatches)
             {
                 isGameFinished = true;
+                audioSource.clip = gameOverAudio;
+                audioSource.Play();
                 endScene.SetActive(true);
                 endScene.transform.GetChild(0).gameObject.SetActive(true);
             }
@@ -171,6 +186,8 @@ public class GameManager : MonoBehaviour
         {
             firstSelectedCard[0].Unmatch();
             secondSelectedCard[0].Unmatch();
+            audioSource.clip = mismatchAudio;
+            audioSource.Play();
         }
         firstSelectedCard.RemoveAt(0);
         secondSelectedCard.RemoveAt(0);
@@ -203,6 +220,8 @@ public class GameManager : MonoBehaviour
         }
         if (!isGameFinished)
         {
+            audioSource.clip = gameOverAudio;
+            audioSource.Play();
             endScene.SetActive(true);
             endScene.transform.GetChild(1).gameObject.SetActive(true);
         }
@@ -220,22 +239,24 @@ public class GameManager : MonoBehaviour
             isGameFinished = isGameFinished,
             cards = new List<CardData>()
         };
-
-        foreach (GameObject card in cards)
+        if (currentMatches < totalMatches)
         {
-            gameData.cards.Add(new CardData
+            foreach (GameObject card in cards)
             {
-                imageName = card.GetComponent<Card>().GetCardImageName(),
-                isFlipped = card.GetComponent<Card>().IsFlipped(),
-                isMatched = card.GetComponent<Card>().IsMatched()
-            });
-        }
+                gameData.cards.Add(new CardData
+                {
+                    imageName = card.GetComponent<Card>().GetCardImageName(),
+                    isFlipped = card.GetComponent<Card>().IsFlipped(),
+                    isMatched = card.GetComponent<Card>().IsMatched()
+                });
+            }
 
-        BinaryFormatter formatter = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/gameData.dat");
-        formatter.Serialize(file, gameData);
-        file.Close();
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream file = File.Create(Application.persistentDataPath + "/gameData.dat");
+            formatter.Serialize(file, gameData);
+            file.Close();
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
+        }
     }
 
     public void LoadGame()
