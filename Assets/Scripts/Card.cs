@@ -3,9 +3,9 @@ using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
-    public Image cardImage;    // The image component of the card
-    private Sprite frontSprite; // The front image (to be set during initialization)
-    private Sprite backSprite;  // The back image (default, already set in the prefab)
+    public Image cardImage;    
+    private Sprite frontSprite;
+    private Sprite backSprite; 
     private GameManager gameManager;
     private bool isFlipped = false;
     private bool isMatched = false;
@@ -42,6 +42,8 @@ public class Card : MonoBehaviour
     {
         isMatched = true;
         FlipCard(true);
+        gameManager.score += 5;
+        gameManager.UpdateScore();
     }
 
     public void Unmatch()
