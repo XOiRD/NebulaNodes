@@ -32,7 +32,7 @@ public class Card : MonoBehaviour
 
     public void OnCardClicked()
     {
-        if (isFlipped || gameManager.IsCheckingMatch()) return;
+        if (isFlipped) return;
 
         FlipCard(true);
         gameManager.OnCardSelected(this);
@@ -52,8 +52,8 @@ public class Card : MonoBehaviour
         FlipCard(false); 
     }
 
-    public Sprite GetCardImage()
+    public string GetCardImageName()
     {
-        return frontSprite;
+        return frontSprite.name;
     }
 }

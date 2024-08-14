@@ -33,8 +33,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int columns;
     [SerializeField] private int rows;
     private List<GameObject> cards = new List<GameObject>();
-    private Card firstSelectedCard;
-    private Card secondSelectedCard;
+    [SerializeField] private List<Card> firstSelectedCard = null;
+    [SerializeField] private List<Card> secondSelectedCard = null;
     private bool isCheckingMatch = false;
     [SerializeField]private int totalMatches;
     [SerializeField]private int currentMatches = 0;
@@ -119,13 +119,16 @@ public class GameManager : MonoBehaviour
 
     public void OnCardSelected(Card selectedCard)
     {
-        if (firstSelectedCard == null)
+        if(firstSelectedCard.Count == secondSelectedCard.Count)
         {
-            firstSelectedCard = selectedCard;
+            firstSelectedCard.Add(selectedCard);
         }
-        else if (secondSelectedCard == null)
+        else
         {
-            secondSelectedCard = selectedCard;
+            secondSelectedCard.Add(selectedCard);
+        }
+        if(firstSelectedCard.Count == 1 && secondSelectedCard.Count == 1)
+        {
             StartCoroutine(CheckMatch());
         }
     }
@@ -136,10 +139,10 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        if (firstSelectedCard.GetCardImage() == secondSelectedCard.GetCardImage())
+        if (firstSelectedCard[0].GetCardImageName() == secondSelectedCard[0].GetCardImageName())
         {
-            firstSelectedCard.SetMatched();
-            secondSelectedCard.SetMatched();
+            firstSelectedCard[0].SetMatched();
+            secondSelectedCard[0].SetMatched();
             currentMatches++;
             if(currentMatches == totalMatches)
             {
@@ -150,13 +153,16 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            firstSelectedCard.Unmatch();
-            secondSelectedCard.Unmatch();
+            firstSelectedCard[0].Unmatch();
+            secondSelectedCard[0].Unmatch();
         }
-
-        firstSelectedCard = null;
-        secondSelectedCard = null;
+        firstSelectedCard.RemoveAt(0);
+        secondSelectedCard.RemoveAt(0);
         isCheckingMatch = false;
+        if(firstSelectedCard.Count > 0 && secondSelectedCard.Count > 0)
+        {
+            StartCoroutine(CheckMatch());
+        }
     }
 
     public bool IsCheckingMatch()
