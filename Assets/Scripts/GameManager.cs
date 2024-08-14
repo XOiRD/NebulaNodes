@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class GameManager : MonoBehaviour
 {
@@ -54,7 +56,13 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CountdownTimer());
     }
 
-    public void UpdateGrid()
+    void LoadPreviousGame()
+    {
+        animator.Play("Gameplay");
+        StartCoroutine(CountdownTimer());
+    }
+
+    public void UpdateGrid(bool isLoading = false)
     {
         // Clear existing cards if any
         foreach (Transform child in gridLayout.transform)
@@ -63,8 +71,11 @@ public class GameManager : MonoBehaviour
         }
         cards.Clear();
 
-        columns = int.Parse(columnsDropdown.options[columnsDropdown.value].text);
-        rows = int.Parse(rowsDropdown.options[rowsDropdown.value].text);
+        if (!isLoading)
+        {
+            columns = int.Parse(columnsDropdown.options[columnsDropdown.value].text);
+            rows = int.Parse(rowsDropdown.options[rowsDropdown.value].text);
+        }
 
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
         gridLayout.constraintCount = rows;
@@ -96,7 +107,11 @@ public class GameManager : MonoBehaviour
             selectedImages.Add(cardImages[i]);
             selectedImages.Add(cardImages[i]);
         }
-        Shuffle(selectedImages);
+
+        if (!isLoading)
+        {
+            Shuffle(selectedImages);
+        }
 
         // Instantiate the cards
         for (int i = 0; i < totalCards; i++)
@@ -128,7 +143,7 @@ public class GameManager : MonoBehaviour
         {
             secondSelectedCard.Add(selectedCard);
         }
-        if(firstSelectedCard.Count == 1 && secondSelectedCard.Count == 1)
+        if (firstSelectedCard.Count == 1 && secondSelectedCard.Count == 1)
         {
             StartCoroutine(CheckMatch());
         }
@@ -193,8 +208,108 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void RestartScene()
+    public void SaveGame()
     {
+        GameData gameData = new GameData
+        {
+            columns = columns,
+            rows = rows,
+            score = score,
+            timerLimit = timerLimit,
+            currentMatches = currentMatches,
+            isGameFinished = isGameFinished,
+            cards = new List<CardData>()
+        };
+
+        foreach (GameObject card in cards)
+        {
+            gameData.cards.Add(new CardData
+            {
+                imageName = card.GetComponent<Card>().GetCardImageName(),
+                isFlipped = card.GetComponent<Card>().IsFlipped(),
+                isMatched = card.GetComponent<Card>().IsMatched()
+            });
+        }
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/gameData.dat");
+        formatter.Serialize(file, gameData);
+        file.Close();
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
+
+    public void LoadGame()
+    {
+        if (File.Exists(Application.persistentDataPath + "/gameData.dat"))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/gameData.dat", FileMode.Open);
+            GameData gameData = (GameData)formatter.Deserialize(file);
+            file.Close();
+
+            columns = gameData.columns;
+            rows = gameData.rows;
+            score = gameData.score;
+            timerLimit = gameData.timerLimit;
+            currentMatches = gameData.currentMatches;
+            isGameFinished = gameData.isGameFinished;
+
+            // Set dropdowns to match loaded state
+            columnsDropdown.value = columnsDropdown.options.FindIndex(option => option.text == columns.ToString());
+            rowsDropdown.value = rowsDropdown.options.FindIndex(option => option.text == rows.ToString());
+
+            UpdateGrid(true);
+
+            for (int i = 0; i < cards.Count; i++)
+            {
+                Card card = cards[i].GetComponent<Card>();
+                CardData cardData = gameData.cards[i];
+
+                card.Initialize(cardImages[int.Parse(cardData.imageName)-1], this); // Reinitialize the card with the saved image
+                card.FlipCard(cardData.isFlipped);
+                if (cardData.isMatched)
+                {
+                    card.SetMatched();
+                }
+            }
+            LoadPreviousGame();
+        }
+    }
+
+    public void RestartScene()
+    {
+        DeleteSaveFile();
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+
+    private void DeleteSaveFile()
+    {
+        if (File.Exists(Application.persistentDataPath + "/gameData.dat"))
+        {
+            File.Delete(Application.persistentDataPath + "/gameData.dat");
+            Debug.Log("Saved game file deleted.");
+        }
+    }
+}
+
+// Supporting Classes
+
+[System.Serializable]
+public class GameData
+{
+    public int columns;
+    public int rows;
+    public int score;
+    public int timerLimit;
+    public int currentMatches;
+    public bool isGameFinished;
+    public List<CardData> cards;
+}
+
+[System.Serializable]
+public class CardData
+{
+    public string imageName;
+    public bool isFlipped;
+    public bool isMatched;
 }

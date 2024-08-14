@@ -56,4 +56,15 @@ public class Card : MonoBehaviour
     {
         return frontSprite.name;
     }
+
+    public bool IsFlipped()
+    {
+        return isFlipped;
+    }
+
+    public bool IsMatched()
+    {
+        return isMatched;
+    }
+
 }
