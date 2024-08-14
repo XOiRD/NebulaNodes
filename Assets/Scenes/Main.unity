@@ -1953,13 +1953,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 840754126}
   cardPrefab: {fileID: 2034506329336434190, guid: 3d15be6234c15994fa7f3aa662ef3175, type: 3}
+  timerLimit: 60
   columnsDropdown: {fileID: 1900904962}
   rowsDropdown: {fileID: 495495533}
   gridLayout: {fileID: 221925039}
   gameArea: {fileID: 221925036}
-  cardImages: []
+  cardImages:
+  - {fileID: 21300000, guid: 382e191811dc48f4ab418178e72e07df, type: 3}
+  - {fileID: 21300000, guid: a29e178ba30749c4bbf03f2ac227b370, type: 3}
+  - {fileID: 21300000, guid: 797ff66a26875874a866de2cb7990d96, type: 3}
+  - {fileID: 21300000, guid: f6a6360fda356ef42b89642f4efbd749, type: 3}
+  - {fileID: 21300000, guid: 989256c59012a0c4f9c4a5269dbfbf67, type: 3}
+  - {fileID: 21300000, guid: 2ac8beb40a772ea41b718f0401b282f8, type: 3}
+  - {fileID: 21300000, guid: b71a1be031848c04a86da7630e4d02c3, type: 3}
+  - {fileID: 21300000, guid: 68d0c4badf6138445acf31b3dcff17ed, type: 3}
+  - {fileID: 21300000, guid: 959e1a4362f13074a82db594c164a13c, type: 3}
+  - {fileID: 21300000, guid: 745bb0490bbdf174480c07fa9466c3c8, type: 3}
+  - {fileID: 21300000, guid: 2302cefa6473a224e8fc7c1d3f3cc231, type: 3}
+  - {fileID: 21300000, guid: 217532440dd19954094e9e0d03480be8, type: 3}
+  - {fileID: 21300000, guid: c4c1c1a19b43f114a80f0fb6ba0ae677, type: 3}
+  - {fileID: 21300000, guid: c2093f4e516750244af25f19957ba8a6, type: 3}
+  - {fileID: 21300000, guid: ba3e8d9f9f687a74db35ac5ff5337267, type: 3}
+  timerText: {fileID: 675179848}
+  scoreText: {fileID: 330357954}
+  score: 0
+  endScene: {fileID: 977898215}
   columns: 0
   rows: 0
+  firstSelectedCard: []
+  secondSelectedCard: []
+  totalMatches: 0
+  currentMatches: 0
 --- !u!1 &787706998
 GameObject:
   m_ObjectHideFlags: 0
