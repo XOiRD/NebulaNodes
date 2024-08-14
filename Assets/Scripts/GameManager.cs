@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Animator animator;
     public GameObject cardPrefab; // The card prefab
     public int timerLimit = 60;
+    bool isGameFinished = false;
 
     [Header("Mainmenu page")]
     [Space(5)]
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI scoreText;
     public int score;
+    public GameObject endScene;
 
     [Header("Mechanics")]
     [Space(5)]
@@ -34,6 +36,8 @@ public class GameManager : MonoBehaviour
     private Card firstSelectedCard;
     private Card secondSelectedCard;
     private bool isCheckingMatch = false;
+    [SerializeField]private int totalMatches;
+    [SerializeField]private int currentMatches = 0;
 
     private List<Sprite> selectedImages = new List<Sprite>();
 
@@ -82,6 +86,7 @@ public class GameManager : MonoBehaviour
         gridLayout.cellSize = new Vector2(cellWidth, cellHeight);
 
         int totalCards = columns * rows;
+        totalMatches = totalCards / 2;
 
         // Select and shuffle card images
         selectedImages = new List<Sprite>();
@@ -135,6 +140,13 @@ public class GameManager : MonoBehaviour
         {
             firstSelectedCard.SetMatched();
             secondSelectedCard.SetMatched();
+            currentMatches++;
+            if(currentMatches == totalMatches)
+            {
+                isGameFinished = true;
+                endScene.SetActive(true);
+                endScene.transform.GetChild(0).gameObject.SetActive(true);
+            }
         }
         else
         {
@@ -161,11 +173,16 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds (0.5f);
         timerText.text = timerLimit.ToString();
-        while(timerLimit > 0)
+        while(timerLimit > 0 && !isGameFinished)
         {
             timerLimit--;
             timerText.text = timerLimit.ToString();
             yield return new WaitForSeconds(1f);
+        }
+        if (!isGameFinished)
+        {
+            endScene.SetActive(true);
+            endScene.transform.GetChild(1).gameObject.SetActive(true);
         }
     }
 
