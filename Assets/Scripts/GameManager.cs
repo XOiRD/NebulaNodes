@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -137,7 +138,7 @@ public class GameManager : MonoBehaviour
     {
         isCheckingMatch = true;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         if (firstSelectedCard[0].GetCardImageName() == secondSelectedCard[0].GetCardImageName())
         {
@@ -192,4 +193,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RestartScene()
+    {
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
 }
